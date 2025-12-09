@@ -189,7 +189,7 @@ def show_location_insights(place_id):
         st.error("Could not retrieve location details")
         return
 
-    # Unpack details (structure is the same for both)
+    # Unpack details (structure is the same for both)streamlit 
     name = place_details["result"]["name"]
     lat = place_details["result"]["geometry"]["location"]["lat"]
     lon = place_details["result"]["geometry"]["location"]["lng"]
@@ -198,7 +198,7 @@ def show_location_insights(place_id):
 
     tz = "UTC"
     date_from = datetime.datetime.now().date()
-    date_to = date_from + datetime.timedelta(days=85)
+    date_to = date_from + datetime.timedelta(days=40)
     categories = ATTENDED_CATEGORIES
     suggested_radius_industry = st.secrets["suggested_radius_industry"] if "suggested_radius_industry" in st.secrets else "accommodation"
 
@@ -218,16 +218,16 @@ def show_location_insights(place_id):
     # Display UI (not cached)
     st.header(f"Over the next 90 days in {name}, you could be missing out on:")
     
-    show_metrics(
-        lat=lat,
-        lon=lon,
-        radius=radius,
-        radius_unit=radius_unit,
-        date_from=date_from,
-        date_to=date_to,
-        suggested_radius={"radius": radius, "radius_unit": radius_unit},
-        tz=tz
-    )
+    # show_metrics(
+    #     lat=lat,
+    #     lon=lon,
+    #     radius=radius,
+    #     radius_unit=radius_unit,
+    #     date_from=date_from,
+    #     date_to=date_to,
+    #     suggested_radius={"radius": radius, "radius_unit": radius_unit},
+    #     tz=tz
+    # )
 
     show_map(
         lat=lat,
@@ -248,10 +248,18 @@ def show_location_insights(place_id):
 
 @st.cache_data
 def fetch_suggested_radius(lat, lon, radius_unit="mi", industry="parking"):
-    phq = get_predicthq_client()
-    suggested_radius = phq.radius.search(location__origin=f"{lat},{lon}", radius_unit=radius_unit, industry=industry)
-
-    return suggested_radius.radius, suggested_radius.radius_unit
+    try:
+        phq = get_predicthq_client()
+        suggested_radius = phq.radius.search(
+            location__origin=f"{lat},{lon}", 
+            radius_unit=radius_unit, 
+            industry=industry
+        )
+        return suggested_radius.radius, suggested_radius.radius_unit
+    except Exception as e:
+        # Fallback if the API fails (e.g. plan restrictions)
+        print(f"Warning: Suggested Radius API failed: {e}")
+        return 2, "mi" # Default to 2 miles
 
 
 def calc_meters(value, unit):
