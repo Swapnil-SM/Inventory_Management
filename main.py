@@ -96,7 +96,7 @@ Focus on Walmart's top-selling inventory categories and private label brands (Gr
     try:
         client = Groq(api_key=st.secrets["groq_api_key"])
         response = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="openai/gpt-oss-20b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5,  # Lower for more factual outputs
             max_tokens=2000
@@ -301,6 +301,10 @@ def visualize_demand(event):
 
 def show_events_list(events):
     """Display events in a clickable dataframe with demand insights"""
+    if not events or "results" not in events or not events["results"]:
+        st.warning("No events found for this location, or the API returned no valid data.")
+        return
+
     results = []
     
     for event in events["results"]:

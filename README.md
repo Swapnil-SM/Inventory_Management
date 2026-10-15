@@ -21,9 +21,14 @@ You'll need to get an API token by following the instructions at [https://docs.p
 
 ```
 api_key = "<your API token>"
-google_api_key = "<your google API token for address lookups>"
+groq_api_key = "<your Groq API key>"
+
+# Keep this only if another part of the app needs Google Places later.
+google_api_key = "<your Google API key>"
 
 title = "Discover and unlock the power of event intelligence for your locations:"
 suggested_radius_industry = "accommodation"
 ```
+
+The current address lookup uses OpenStreetMap, so `google_api_key` is not required to run this version. Keep `secrets.toml` private and run the app from the project folder with `streamlit run main.py`.
 
